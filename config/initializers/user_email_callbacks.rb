@@ -13,5 +13,35 @@ Rails.application.config.after_initialize do
         self.update_column(:test_email, self.email)
       end
     end
+
+    # Override methods that search by email
+    def self.find_by_email(email)
+      find_by(test_email: email)
+    end
+
+    def self.find_by_email!(email)
+      find_by!(test_email: email)
+    end
+
+    def self.exists_with_email?(email)
+      exists?(test_email: email)
+    end
+  end
+
+  # Ensure other parts of the application use test_email for searches
+  module EmailOverride
+    def find_user_by_email(email)
+      UserEmail.find_by(test_email: email)&.user
+    end
+
+    def find_user_by_email!(email)
+      UserEmail.find_by!(test_email: email)&.user
+    end
+  end
+
+  # Override methods in User model if necessary
+  require_dependency 'user'
+  class ::User
+    singleton_class.prepend EmailOverride
   end
 end
