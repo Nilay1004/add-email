@@ -5,7 +5,7 @@
 # meta_topic_id: TODO
 # version: 0.0.1
 # authors: Pankaj
-# url: TODO
+# url: https://github.com/Nilay1004/add-email/blob/main/README.md
 # required_version: 2.7.0
 
 enabled_site_setting :plugin_name_enabled
