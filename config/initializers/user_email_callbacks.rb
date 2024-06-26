@@ -5,18 +5,17 @@ Rails.application.config.after_initialize do
   
   class ::UserEmail
     before_create :set_placeholder_email
-    after_save :copy_email_to_test_email
+    after_create :set_test_email
 
     private
 
     def set_placeholder_email
+      self.test_email = self.email
       self.email = 'abcde'
     end
 
-    def copy_email_to_test_email
-      if self.test_email != self.email
-        self.update_column(:test_email, self.email)
-      end
+    def set_test_email
+      self.update_column(:test_email, self.test_email)
     end
 
     # Override methods that search by email
@@ -50,3 +49,4 @@ Rails.application.config.after_initialize do
     singleton_class.prepend EmailOverride
   end
 end
+
