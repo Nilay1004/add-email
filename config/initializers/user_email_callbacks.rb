@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-after_initialize do
+Rails.application.config.after_initialize do
   require_dependency 'user_email'
   
   class ::UserEmail
