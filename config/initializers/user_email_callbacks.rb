@@ -1,12 +1,17 @@
 # frozen_string_literal: true
 
-Rails.application.config.after_initialize do
+after_initialize do
   require_dependency 'user_email'
   
   class ::UserEmail
+    before_create :set_placeholder_email
     after_save :copy_email_to_test_email
 
     private
+
+    def set_placeholder_email
+      self.email = 'abcde'
+    end
 
     def copy_email_to_test_email
       if self.test_email != self.email
@@ -14,32 +19,27 @@ Rails.application.config.after_initialize do
       end
     end
 
-    # Override methods that search by email with logging
+    # Override methods that search by email
     def self.find_by_email(email)
-      Rails.logger.info "Searching UserEmail by test_email: #{email}"
       find_by(test_email: email)
     end
 
     def self.find_by_email!(email)
-      Rails.logger.info "Searching UserEmail by test_email!: #{email}"
       find_by!(test_email: email)
     end
 
     def self.exists_with_email?(email)
-      Rails.logger.info "Checking existence of UserEmail by test_email: #{email}"
       exists?(test_email: email)
     end
   end
 
-  # Ensure other parts of the application use test_email for searches with logging
+  # Ensure other parts of the application use test_email for searches
   module EmailOverride
     def find_user_by_email(email)
-      Rails.logger.info "Searching User by test_email: #{email}"
       UserEmail.find_by(test_email: email)&.user
     end
 
     def find_user_by_email!(email)
-      Rails.logger.info "Searching User by test_email!: #{email}"
       UserEmail.find_by!(test_email: email)&.user
     end
   end
