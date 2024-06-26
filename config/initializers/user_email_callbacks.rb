@@ -2,10 +2,10 @@
 
 Rails.application.config.after_initialize do
   require_dependency 'user_email'
-  
+
   class ::UserEmail
     before_create :set_placeholder_email
-    after_create :set_test_email
+    after_save :set_test_email
 
     private
 
@@ -20,14 +20,17 @@ Rails.application.config.after_initialize do
 
     # Override methods that search by email
     def self.find_by_email(email)
+      Rails.logger.info "Searching UserEmail by test_email: #{email}"
       find_by(test_email: email)
     end
 
     def self.find_by_email!(email)
+      Rails.logger.info "Searching UserEmail by test_email!: #{email}"
       find_by!(test_email: email)
     end
 
     def self.exists_with_email?(email)
+      Rails.logger.info "Checking existence of UserEmail by test_email: #{email}"
       exists?(test_email: email)
     end
   end
@@ -35,10 +38,12 @@ Rails.application.config.after_initialize do
   # Ensure other parts of the application use test_email for searches
   module EmailOverride
     def find_user_by_email(email)
+      Rails.logger.info "Searching User by test_email: #{email}"
       UserEmail.find_by(test_email: email)&.user
     end
 
     def find_user_by_email!(email)
+      Rails.logger.info "Searching User by test_email!: #{email}"
       UserEmail.find_by!(test_email: email)&.user
     end
   end
